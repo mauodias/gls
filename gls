@@ -5,12 +5,30 @@ from __future__ import print_function
 import sys
 import subprocess
 
+status_format = {
+        'M': 'modified',
+        'A': 'added',
+        'D': 'deleted',
+        'R': 'renamed',
+        'C': 'copied',
+        'U': 'updated',
+        '??': 'untracked'
+}
+
 def run(args):
     args = [] if not args else args
     lscmd = ['ls']
     lscmd.extend(args)
     cmd = subprocess.Popen(lscmd, stdout=subprocess.PIPE)
     output = cmd.stdout.read().rstrip()
+
+    gst_cmd = subprocess.Popen(['git', 'status', '--porcelain'], stdout=subprocess.PIPE)
+    git_status = gst_cmd.stdout.read().rstrip().split('\n')
+    for entry in git_status:
+        status, name = entry.split()
+        if name in output:
+            output = output.replace(name, '{} ({})'.format(name, status_format[status]))
+
     print(output)
 
 if __name__ == "__main__":
