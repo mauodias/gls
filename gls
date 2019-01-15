@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import sys
+import subprocess
+
+def run(args):
+    args = [] if not args else args
+    lscmd = ['ls']
+    lscmd.extend(args)
+    cmd = subprocess.Popen(lscmd, stdout=subprocess.PIPE)
+    output = cmd.stdout.read().rstrip()
+    print(output)
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    run(args)
