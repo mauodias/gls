@@ -22,12 +22,16 @@ def run(args):
     cmd = subprocess.Popen(lscmd, stdout=subprocess.PIPE)
     output = cmd.stdout.read().rstrip()
 
-    gst_cmd = subprocess.Popen(['git', 'status', '--porcelain'], stdout=subprocess.PIPE)
-    git_status = gst_cmd.stdout.read().rstrip().split('\n')
-    for entry in git_status:
-        status, name = entry.split()
-        if name in output:
-            output = output.replace(name, '{} ({})'.format(name, status_format[status]))
+    gst_cmd = subprocess.Popen(['git', 'status', '--porcelain'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = gst_cmd.communicate()
+    if 'not a git repository' in stderr:
+        pass
+    else:
+        git_status = stdout.rstrip().split('\n')
+        for entry in git_status:
+            status, name = entry.split()
+            if name in output:
+                output = output.replace(name, '{} ({})'.format(name, status_format[status]))
 
     print(output)
 
